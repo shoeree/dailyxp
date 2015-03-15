@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal" >
+    <EditText
+        android:id="@+id/rowSkillName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Skill"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_margin="20px" />
+    <TextView
+        android:id="@+id/rowSkillExp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_margin="20px" />
+    <Button
+        android:id="@+id/rowUpExp"
+        android:text="Inc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20px" />
+    <Button
+        android:id="@+id/rowDownExp"
+        android:text="Dec"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20px" />
+</LinearLayout>
