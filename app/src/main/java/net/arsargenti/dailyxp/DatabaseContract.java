@@ -8,24 +8,35 @@ import android.provider.BaseColumns;
 public class DatabaseContract {
     public DatabaseContract() {}
 
-    public static String CREATE() {
-        return         SkillName.CREATE() +
-                "; " + ExpHist.CREATE() +
-                "; " + ExpTotal.CREATE() +
-                ";";
+    public static String[] CREATE_ALL() {
+        return new String[]{
+                Skill.CREATE(),
+                ExpHist.CREATE(),
+                ExpTotal.CREATE()
+        };
     }
 
-    public static abstract class SkillName implements BaseColumns {
-        public static final String TABLE_NAME = "SkillName";
-        public static final String COL_SKILL_ID   = "skill_id";   // Int
-        public static final String COL_SKILL_NAME = "skill_name"; // String
+    public static String[] DROP_ALL() {
+        return new String[] {
+                Skill.DROP(),
+                ExpHist.DROP(),
+                ExpTotal.DROP()
+        };
+    }
+
+    public static abstract class Skill implements BaseColumns {
+        public static final String TABLE_NAME = "Skill";
+        public static final String COL_NAME = "name"; // String
 
         public static final String CREATE() {
             return "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ( " +
-                    _ID + " INTEGER PRIMARY KEY" +
-                    ", " + COL_SKILL_ID   + " INTEGER" +
-                    ", " + COL_SKILL_NAME + " TEXT" +
+                    _ID + " INTEGER PRIMARY KEY AUTOINCREMENT" +
+                    ", " + COL_NAME + " TEXT" +
                     " )";
+        }
+
+        public static final String DROP() {
+            return "DROP TABLE IF EXISTS " + TABLE_NAME;
         }
     }
 
@@ -37,11 +48,15 @@ public class DatabaseContract {
 
         public static final String CREATE() {
             return "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ( " +
-                    _ID + " INTEGER PRIMARY KEY" +
+                    _ID + " INTEGER PRIMARY KEY AUTOINCREMENT" +
                     ", " + COL_DATE      + " TEXT" +
                     ", " + COL_SKILL_ID  + " INTEGER" +
                     ", " + COL_SKILL_EXP + " INTEGER" +
                     " )";
+        }
+
+        public static final String DROP() {
+            return "DROP TABLE IF EXISTS " + TABLE_NAME;
         }
     }
 
@@ -52,10 +67,14 @@ public class DatabaseContract {
 
         public static final String CREATE() {
             return "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ( " +
-                    _ID + " INTEGER PRIMARY KEY" +
+                    _ID + " INTEGER PRIMARY KEY AUTOINCREMENT" +
                     ", " + COL_SKILL_ID  + " INTEGER" +
                     ", " + COL_SKILL_EXP + " INTEGER" +
                     " )";
+        }
+
+        public static final String DROP() {
+            return "DROP TABLE IF EXISTS " + TABLE_NAME;
         }
     }
 
