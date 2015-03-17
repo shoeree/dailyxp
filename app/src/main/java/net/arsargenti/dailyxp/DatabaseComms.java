@@ -61,6 +61,45 @@ public class DatabaseComms {
                 ExpHist.COL_DATE + " = ?", selectionArgs, null, null, null);
     }
 
+    public static long queryAddSkillForDate(SQLiteDatabase db, Long id, String date) {
+        // Get the skill ID if it already exists in this date.
+        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+        queryBuilder.setTables(ExpHist.TABLE_NAME);
+        String[] projection = { ExpHist._ID, ExpHist.COL_SKILL_ID };
+        String[] selectionArgs = {String.valueOf(id)};
+
+        Cursor cursor = queryBuilder.query(db, projection,
+                ExpHist.COL_SKILL_ID + " = ?", selectionArgs, null, null, null);
+        cursor.moveToFirst();
+        int count = cursor.getCount();
+        if (count == 1) {
+            return -1;
+        } else if (count > 1) {
+            throw new RuntimeException("Database inconsistent!");
+        }
+
+        // Add the skill to this date.
+        ContentValues values = new ContentValues();
+        values.put(ExpHist.COL_DATE, date);
+        values.put(ExpHist.COL_SKILL_ID, id);
+        values.put(ExpHist.COL_SKILL_EXP, 0);
+        return db.insert(Skill.TABLE_NAME, null, values);
+    }
+
+    public static Cursor querySkills(SQLiteDatabase db) {
+        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+        queryBuilder.setTables(Skill.TABLE_NAME);
+        String[] projection = { Skill._ID, Skill.COL_NAME };
+
+        return queryBuilder.query(db, projection, null, null, null, null, null);
+    }
+
+    /**
+     * A query which adds a skill to the dimension table.
+     * @param db
+     * @param skillName
+     * @return the _ID of the skill; a long integer
+     */
     public static long queryAddSkill(SQLiteDatabase db, String skillName) {
         // Get the skill ID if it already exists.
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();

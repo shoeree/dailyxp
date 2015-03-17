@@ -15,6 +15,31 @@
         android:id="@+id/headerText"
         android:layout_gravity="center_horizontal" />
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:weightSum="1">
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/enterSkillField"
+            android:layout_weight="0.96"
+            android:text="Enter a skill" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add"
+            android:id="@+id/addSkillButton"
+            android:layout_marginLeft="20px"
+            android:onClick="addSkill" />
+
+    </LinearLayout>
+
     <ListView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"

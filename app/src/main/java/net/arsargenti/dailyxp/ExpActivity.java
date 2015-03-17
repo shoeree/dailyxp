@@ -11,10 +11,12 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,9 +31,12 @@ public class ExpActivity extends ActionBarActivity {
 
     private static final String DATE_FORMAT = "yyyy-MM-dd";
     private Date date;
+    private String dateString;
     private int year;
     private int month;
     private int day;
+
+    DayExpCursorAdapter dayExpCursorAdapter;
 
     ExpDatabaseOpenHelper expDatabaseOpenHelper;
     SQLiteDatabase db;
@@ -48,7 +53,7 @@ public class ExpActivity extends ActionBarActivity {
         year = intent.getIntExtra(MainActivity.SELECTED_DATE_YEAR, -1);
         month = intent.getIntExtra(MainActivity.SELECTED_DATE_MONTH, -1);
         day = intent.getIntExtra(MainActivity.SELECTED_DATE_DAY, -1);
-        String dateString = year + "-" + month + "-" + day;
+        dateString = year + "-" + month + "-" + day;
 
         if (year == -1 || month == -1 || day == -1) {
             throw new RuntimeException("Invalid year/month/day given to Activity from calendar: " +
@@ -56,7 +61,7 @@ public class ExpActivity extends ActionBarActivity {
         }
 
         Cursor cursor = DatabaseComms.querySkillsForDate(db, dateString);
-        DayExpCursorAdapter cursorAdapter = new DayExpCursorAdapter(getApplicationContext(), cursor);
+        dayExpCursorAdapter = new DayExpCursorAdapter(getApplicationContext(), cursor);
 
         SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_FORMAT);
         try {
@@ -65,7 +70,7 @@ public class ExpActivity extends ActionBarActivity {
             headerText.setText(this.date.toString());
 
             ListView listView = (ListView) findViewById(R.id.listView);
-            listView.setAdapter(cursorAdapter);
+            listView.setAdapter(dayExpCursorAdapter);
 
         } catch (ParseException e) {
             System.err.println("Error parsing date string: " + dateString);
@@ -73,6 +78,13 @@ public class ExpActivity extends ActionBarActivity {
         }
     }
 
+    // User clicks the "Add" skill button.
+    public void addSkill(View view) {
+        String skillName = ((EditText)findViewById(R.id.enterSkillField)).getText().toString();
+        Long skillId = DatabaseComms.queryAddSkill(db, skillName);
+        Long expHistId = DatabaseComms.queryAddSkillForDate(db, skillId, dateString);
+        dayExpCursorAdapter.notifyDataSetChanged();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -91,8 +103,8 @@ public class ExpActivity extends ActionBarActivity {
                 return openSettings();
             case R.id.action_search:
                 return openSearch();
-            case R.id.action_add:
-                return openAddSkill();
+            case R.id.action_select_skill:
+                return openSelectSkill();
         }
 
         return super.onOptionsItemSelected(item);
@@ -112,24 +124,28 @@ public class ExpActivity extends ActionBarActivity {
         return true;
     }
 
-    public boolean openAddSkill() {
+    public boolean openSelectSkill() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.dialog_title_add_skill);
+        builder.setTitle(R.string.dialog_title_select_skill);
 
-        // Set up Text input field.
-        final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(input);
+        // Set up spinner for selecting available skills.
+        final Spinner spinner = new Spinner(getApplicationContext());
+        builder.setView(spinner);
+
+        // Populate the spinner.
+        String[] from = {DatabaseContract.Skill.COL_NAME};
+        int[] to = {android.R.id.text1};
+        final SimpleCursorAdapter simpleCursorAdapter = new SimpleCursorAdapter(getApplicationContext(),
+                android.R.layout.simple_spinner_item, DatabaseComms.querySkills(db), from, to, 0);
+        simpleCursorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(simpleCursorAdapter);
 
         // Set up OK and Cancel buttons.
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String newSkill = input.getText().toString();
-
-                // Add the new skill name to the database.
-                DatabaseComms.queryAddSkill(db, newSkill);
-
+                int position = spinner.getSelectedItemPosition();
+                ((EditText)findViewById(R.id.enterSkillField)).setText(simpleCursorAdapter.getItem(position).toString());
                 dialog.dismiss();
             }
         });
