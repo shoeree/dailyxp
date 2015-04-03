@@ -9,6 +9,7 @@ import android.preference.DialogPreference;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,8 +30,6 @@ import java.util.Date;
 
 public class ExpActivity extends ActionBarActivity {
 
-    private static final String DATE_FORMAT = "yyyy-MM-dd";
-    private Date date;
     private String dateString;
     private int year;
     private int month;
@@ -60,30 +59,70 @@ public class ExpActivity extends ActionBarActivity {
                     dateString);
         }
 
-        Cursor cursor = DatabaseComms.querySkillsForDate(db, dateString);
-        dayExpCursorAdapter = new DayExpCursorAdapter(getApplicationContext(), cursor);
+        dayExpCursorAdapter = new DayExpCursorAdapter(getApplicationContext(), dateString, db, ExpActivity.this);
 
-        SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_FORMAT);
-        try {
-            this.date = dateFormatter.parse(dateString);
-            TextView headerText = (TextView) findViewById(R.id.headerText);
-            headerText.setText(this.date.toString());
+        TextView headerText = (TextView) findViewById(R.id.headerText);
+        headerText.setText(dateString);
 
-            ListView listView = (ListView) findViewById(R.id.listView);
-            listView.setAdapter(dayExpCursorAdapter);
-
-        } catch (ParseException e) {
-            System.err.println("Error parsing date string: " + dateString);
-            e.printStackTrace();
-        }
+        ListView listView = (ListView) findViewById(R.id.listView);
+        listView.setAdapter(dayExpCursorAdapter);
     }
 
     // User clicks the "Add" skill button.
     public void addSkill(View view) {
         String skillName = ((EditText)findViewById(R.id.enterSkillField)).getText().toString();
+        if (skillName.isEmpty()) {
+            Toast.makeText(getApplicationContext(),
+                    "Cannot add an empty skill.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         Long skillId = DatabaseComms.queryAddSkill(db, skillName);
-        Long expHistId = DatabaseComms.queryAddSkillForDate(db, skillId, dateString);
-        dayExpCursorAdapter.notifyDataSetChanged();
+        //Long expHistId = DatabaseComms.queryAddSkillForDate(db, skillId, dateString);
+        Log.i(getClass().getName(), "INSERT INTO Skill returned " + skillId);
+        if (skillId == -1) {
+            Toast.makeText(getApplicationContext(),
+                    "Skill already exists!", Toast.LENGTH_SHORT).show();
+        } else {
+            commitExpChanges();
+            dayExpCursorAdapter.updateData();
+        }
+        ((EditText) findViewById(R.id.enterSkillField)).setText("");
+    }
+
+    // User stops the activity -- all exp values should be saved for each skill.
+    // This can also happen if the user goes back to the main activity or otherwise leaves this date.
+    @Override
+    protected void onStop() {
+        super.onStop();
+        commitExpChanges();
+    }
+
+    /**
+     * Commit all EXP changes to the database. This should be called whenever the activity
+     * is closed, or if the data is reloaded from the db, etc. BEFORE those things happen.
+     */
+    protected void commitExpChanges() {
+        ListView listView = (ListView) findViewById(R.id.listView);
+        int numItems = listView.getCount();
+        for (int i = 0; i < numItems; i++) {
+            View v = listView.getChildAt(i);
+            TextView rowView = (TextView)v.findViewById(R.id.rowSkillName);
+            if (rowView == null) {
+                continue;
+            }
+            String skillName = rowView.getText().toString();
+            String skillExp = ((TextView) v.findViewById(R.id.rowSkillExp)).getText().toString();
+            if (skillExp.isEmpty()
+                    // TODO: For some reason, sqlite is reading NULLs as 0 from the DB...
+                    /*|| skillExp.equals("0")*/ ) {
+                Log.i(getClass().getName(), "Ignoring skill '" + skillName + "' with no EXP value.");
+            } else {
+                Log.i(getClass().getName(),
+                        "Updating " + skillName + "'s EXP (" + skillExp + ") values: " +
+                        DatabaseComms.queryAddSkillForDate(db, dateString, skillName, Integer.parseInt(skillExp)));
+            }
+        }
     }
 
     @Override
@@ -103,8 +142,8 @@ public class ExpActivity extends ActionBarActivity {
                 return openSettings();
             case R.id.action_search:
                 return openSearch();
-            case R.id.action_select_skill:
-                return openSelectSkill();
+            //case R.id.action_select_skill:
+                //return openSelectSkill();
         }
 
         return super.onOptionsItemSelected(item);
@@ -124,7 +163,7 @@ public class ExpActivity extends ActionBarActivity {
         return true;
     }
 
-    public boolean openSelectSkill() {
+    /*public boolean openSelectSkill() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.dialog_title_select_skill);
 
@@ -144,8 +183,9 @@ public class ExpActivity extends ActionBarActivity {
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                int position = spinner.getSelectedItemPosition();
-                ((EditText)findViewById(R.id.enterSkillField)).setText(simpleCursorAdapter.getItem(position).toString());
+                Cursor cursor = (Cursor)spinner.getSelectedItem();
+                String value = cursor.getString(cursor.getColumnIndex(DatabaseContract.Skill.COL_NAME));
+                ((EditText)findViewById(R.id.enterSkillField)).setText(value);
                 dialog.dismiss();
             }
         });
@@ -158,5 +198,5 @@ public class ExpActivity extends ActionBarActivity {
 
         builder.show();
         return true;
-    }
+    }*/
 }

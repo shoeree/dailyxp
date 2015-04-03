@@ -4,41 +4,44 @@
     android:layout_height="match_parent"
     android:orientation="horizontal"
     android:weightSum="1">
-    <Button
+    <ImageButton
         android:id="@+id/rowRemoveSkill"
-        android:text="Del"
-        android:layout_width="50dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="20px"
-        android:layout_weight="0.10" />
+        android:src="@drawable/x2"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="20px" />
     <EditText
         android:id="@+id/rowSkillName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Skill"
+        android:textSize="34px"
+        android:editable="false"
+        android:textColor="@color/text_body"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:layout_margin="20px"
-        android:layout_weight="0.70" />
+        android:layout_weight="0.50" />
     <TextView
         android:id="@+id/rowSkillExp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="0"
+        android:textSize="34px"
+        android:textColor="@color/text_body"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_margin="20px"
-        android:layout_weight="0.10" />
-    <Button
+        android:layout_weight="0.15"
+        android:textAlignment="center" />
+    <ImageButton
         android:id="@+id/rowUpExp"
-        android:text="+"
+        android:src="@drawable/plus"
         android:layout_width="40dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="20px"
-        android:layout_weight="0.05" />
-    <Button
+        android:layout_height="40dp"
+        android:layout_margin="20px" />
+    <ImageButton
         android:id="@+id/rowDownExp"
-        android:text="-"
+        android:src="@drawable/minus"
         android:layout_width="40dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="20px"
-        android:layout_weight="0.05" />
+        android:layout_height="40dp"
+        android:layout_margin="20px" />
 </LinearLayout>

@@ -9,7 +9,7 @@ import android.util.Log;
  * Created by Sterling on 2015/03/14.
  */
 public class ExpDatabaseOpenHelper extends SQLiteOpenHelper {
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "DailyExp.db";
 
     public ExpDatabaseOpenHelper(Context context) {

@@ -5,7 +5,9 @@
     <string name="action_settings">Settings</string>
     <string name="action_select_skill">Select Skill...</string>
     <string name="dialog_title_select_skill">Select Skill</string>
+    <string name="dialog_title_delete_skill">Delete Skill</string>
     <string name="title_activity_exp">Experience</string>
     <string name="exp_activity_header">Date</string>
+    <string name="add_skill">Enter a new skill name...</string>
 
 </resources>

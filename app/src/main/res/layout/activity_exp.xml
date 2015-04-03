@@ -26,8 +26,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/enterSkillField"
-            android:layout_weight="0.96"
-            android:text="Enter a skill" />
+            android:hint="@string/add_skill"
+            android:layout_weight="0.88" />
 
         <Button
             style="?android:attr/buttonStyleSmall"

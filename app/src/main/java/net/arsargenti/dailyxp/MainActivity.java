@@ -11,6 +11,8 @@ import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.Calendar;
+
 
 public class MainActivity extends ActionBarActivity {
 
@@ -38,6 +40,14 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
+    public void gotoToday(View view) {
+        Intent intent = new Intent(MainActivity.this, ExpActivity.class);
+        final Calendar c = Calendar.getInstance();
+        intent.putExtra(SELECTED_DATE_YEAR, c.get(Calendar.YEAR));
+        intent.putExtra(SELECTED_DATE_MONTH, c.get(Calendar.MONTH)+1); // XXX: There's a bug in the calendar (I think) where month goes from 0->11.
+        intent.putExtra(SELECTED_DATE_DAY, c.get(Calendar.DAY_OF_MONTH));
+        startActivity(intent);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

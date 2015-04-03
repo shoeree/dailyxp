@@ -12,6 +12,7 @@ public class DatabaseContract {
         return new String[]{
                 Skill.CREATE(),
                 ExpHist.CREATE(),
+                CREATE_INDEX(ExpHist.TABLE_NAME, ExpHist.COL_DATE),
                 ExpTotal.CREATE()
         };
     }
@@ -20,8 +21,18 @@ public class DatabaseContract {
         return new String[] {
                 Skill.DROP(),
                 ExpHist.DROP(),
+                DROP_INDEX(ExpHist.TABLE_NAME, ExpHist.COL_DATE),
                 ExpTotal.DROP()
         };
+    }
+
+    public static String CREATE_INDEX(String tableName, String indexColumn) {
+        return "CREATE INDEX IF NOT EXISTS " + tableName + "_" + indexColumn + "_idx ON "
+                + tableName + "(" + indexColumn + ")";
+    }
+
+    public static String DROP_INDEX(String tableName, String indexColumn) {
+        return "DROP INDEX IF EXISTS " + tableName + "_" + indexColumn + "_idx";
     }
 
     public static abstract class Skill implements BaseColumns {
@@ -50,7 +61,7 @@ public class DatabaseContract {
             return "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ( " +
                     _ID + " INTEGER PRIMARY KEY AUTOINCREMENT" +
                     ", " + COL_DATE      + " TEXT" +
-                    ", " + COL_SKILL_ID  + " INTEGER" +
+                    ", " + COL_SKILL_ID  + " INTEGER REFERENCES " + Skill.TABLE_NAME + "( " + Skill._ID + " ) ON DELETE CASCADE" +
                     ", " + COL_SKILL_EXP + " INTEGER" +
                     " )";
         }
@@ -68,7 +79,7 @@ public class DatabaseContract {
         public static final String CREATE() {
             return "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ( " +
                     _ID + " INTEGER PRIMARY KEY AUTOINCREMENT" +
-                    ", " + COL_SKILL_ID  + " INTEGER" +
+                    ", " + COL_SKILL_ID  + " INTEGER REFERENCES " + Skill.TABLE_NAME + "( " + Skill._ID + " ) ON DELETE CASCADE" +
                     ", " + COL_SKILL_EXP + " INTEGER" +
                     " )";
         }
